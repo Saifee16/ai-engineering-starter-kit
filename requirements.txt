@@ -1,0 +1,6 @@
+fastapi[standard-no-fastapi-cloud-cli]
+pydantic-settings
+SQLAlchemy
+psycopg[binary]
+google-genai
+python-dotenv
