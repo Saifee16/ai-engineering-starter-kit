@@ -1,4 +1,5 @@
-from fastapi.testclient import TestClient
+import pytest
+from httpx import AsyncClient
 
 from app.schemas.ai import StructuredData
 
@@ -7,7 +8,10 @@ class FakeGeminiService:
     def chat(self, message: str) -> str:
         return f"Fake reply for: {message}"
 
-    def structured_explanation(self, topic: str) -> StructuredData:
+    def structured_explanation(
+        self,
+        topic: str,
+    ) -> StructuredData:
         return StructuredData(
             title=topic,
             summary=f"Fake summary for {topic}",
@@ -15,13 +19,17 @@ class FakeGeminiService:
         )
 
 
-def test_chat_endpoint(client: TestClient, monkeypatch) -> None:
+@pytest.mark.anyio
+async def test_chat_endpoint(
+    client: AsyncClient,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(
         "app.api.v1.endpoints.ai.GeminiService",
         FakeGeminiService,
     )
 
-    response = client.post(
+    response = await client.post(
         "/api/v1/chat",
         json={"message": "Explain FastAPI"},
     )
@@ -31,16 +39,20 @@ def test_chat_endpoint(client: TestClient, monkeypatch) -> None:
     body = response.json()
 
     assert body["success"] is True
-    assert body["data"]["reply"] == "Fake reply for: Explain FastAPI"
+    assert body["data"]["reply"] == ("Fake reply for: Explain FastAPI")
 
 
-def test_structured_endpoint(client: TestClient, monkeypatch) -> None:
+@pytest.mark.anyio
+async def test_structured_endpoint(
+    client: AsyncClient,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(
         "app.api.v1.endpoints.ai.GeminiService",
         FakeGeminiService,
     )
 
-    response = client.post(
+    response = await client.post(
         "/api/v1/structured",
         json={"topic": "FastAPI"},
     )
@@ -51,12 +63,15 @@ def test_structured_endpoint(client: TestClient, monkeypatch) -> None:
 
     assert body["success"] is True
     assert body["data"]["title"] == "FastAPI"
-    assert body["data"]["summary"] == "Fake summary for FastAPI"
+    assert body["data"]["summary"] == ("Fake summary for FastAPI")
     assert body["data"]["difficulty"] == "beginner"
 
 
-def test_chat_rejects_empty_message(client: TestClient) -> None:
-    response = client.post(
+@pytest.mark.anyio
+async def test_chat_rejects_empty_message(
+    client: AsyncClient,
+) -> None:
+    response = await client.post(
         "/api/v1/chat",
         json={"message": ""},
     )

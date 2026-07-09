@@ -1,27 +1,28 @@
 from fastapi import APIRouter
 
-from app.schemas.ai import ChatData, ChatRequest, StructuredRequest
+from app.schemas.ai import ChatData, ChatRequest, StructuredData, StructuredRequest
 from app.schemas.common import SuccessResponse
 from app.services.gemini_service import GeminiService
 
 router = APIRouter()
 
 
-@router.post("/chat", response_model=SuccessResponse)
-def chat(request: ChatRequest) -> SuccessResponse:
+@router.post("/chat", response_model=SuccessResponse[ChatData])
+def chat(request: ChatRequest) -> SuccessResponse[ChatData]:
     service = GeminiService()
     reply = service.chat(request.message)
 
-    return SuccessResponse(
-        data=ChatData(reply=reply).model_dump()
-    )
+    return SuccessResponse(data=ChatData(reply=reply))
 
 
-@router.post("/structured", response_model=SuccessResponse)
-def structured(request: StructuredRequest) -> SuccessResponse:
+@router.post(
+    "/structured",
+    response_model=SuccessResponse[StructuredData],
+)
+def structured(
+    request: StructuredRequest,
+) -> SuccessResponse[StructuredData]:
     service = GeminiService()
     result = service.structured_explanation(request.topic)
 
-    return SuccessResponse(
-        data=result.model_dump()
-    )
+    return SuccessResponse(data=result)

@@ -1,6 +1,7 @@
 -r requirements.txt
 
+anyio
+httpx
 pytest
 pytest-cov
-httpx
 ruff
