@@ -1,6 +1,8 @@
-from typing import Any
+from typing import Generic, Literal, TypeVar
 
 from pydantic import BaseModel
+
+DataT = TypeVar("DataT")
 
 
 class ErrorDetail(BaseModel):
@@ -8,11 +10,11 @@ class ErrorDetail(BaseModel):
     message: str
 
 
-class SuccessResponse(BaseModel):
-    success: bool = True
-    data: Any
+class SuccessResponse(BaseModel, Generic[DataT]):
+    success: Literal[True] = True
+    data: DataT
 
 
 class ErrorResponse(BaseModel):
-    success: bool = False
+    success: Literal[False] = False
     error: ErrorDetail

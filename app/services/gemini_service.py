@@ -1,3 +1,4 @@
+from fastapi import status
 from google import genai
 
 from app.core.config import get_settings
@@ -16,6 +17,7 @@ class GeminiService:
             raise AppError(
                 message="Gemini API key is missing.",
                 code="GEMINI_API_KEY_MISSING",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
         self.client = genai.Client(api_key=self.settings.gemini_api_key)
@@ -35,12 +37,17 @@ class GeminiService:
             raise AppError(
                 message="Gemini chat request failed.",
                 code="GEMINI_CHAT_FAILED",
+                status_code=status.HTTP_502_BAD_GATEWAY,
             ) from exc
 
-    def structured_explanation(self, topic: str) -> StructuredData:
+    def structured_explanation(
+        self,
+        topic: str,
+    ) -> StructuredData:
         prompt = (
             f"Explain this topic for a beginner: {topic}. "
-            "Return a short title, a short summary, and difficulty level."
+            "Return a short title, a short summary, "
+            "and difficulty level."
         )
 
         try:
@@ -62,4 +69,5 @@ class GeminiService:
             raise AppError(
                 message="Gemini structured request failed.",
                 code="GEMINI_STRUCTURED_FAILED",
+                status_code=status.HTTP_502_BAD_GATEWAY,
             ) from exc

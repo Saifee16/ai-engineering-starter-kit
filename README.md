@@ -1,83 +1,159 @@
 # AI Engineering Starter Kit
 
-A reusable FastAPI backend template for building AI-powered applications with Gemini, clean configuration, logging, exception handling, database setup, Docker, Swagger docs, and tests.
+[![CI](https://github.com/Saifee16/ai-engineering-starter-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/Saifee16/ai-engineering-starter-kit/actions/workflows/ci.yml)
+
+A reusable FastAPI backend starter template for AI-powered applications.
+
+It includes typed configuration, Gemini integration, structured AI output, SQLite/PostgreSQL-ready database configuration, centralized logging, exception handling, tests, Docker, CI, and Swagger documentation.
+
+## Why This Repository Exists
+
+AI prototypes often start as a single Python file and become difficult to maintain as routes, external model calls, configuration, database code, and error handling grow.
+
+This starter kit provides a small layered backend architecture that can be reused for:
+
+- AI assistants
+- RAG backends
+- Agent APIs
+- AI SaaS products
+- Extraction pipelines
+- Classification APIs
+- Internal AI tools
 
 ## Features
 
-* FastAPI backend
-* Pydantic settings
-* `.env` based configuration
-* SQLite/PostgreSQL database support
-* Gemini API integration
-* `/chat` AI endpoint
-* `/structured` JSON AI endpoint
-* Health check endpoint
-* Centralized logging
-* Custom exception handling
-* Pytest test suite
-* Docker support
-* Swagger API docs
+- FastAPI
+- Pydantic Settings
+- Environment-based configuration
+- Typed API responses
+- API versioning
+- Gemini API integration
+- Structured Gemini JSON output
+- SQLite support
+- PostgreSQL-ready SQLAlchemy configuration
+- Centralized logging
+- Global exception handling
+- Health check endpoint
+- Async HTTP endpoint tests
+- Mocked Gemini tests
+- Pytest coverage
+- Ruff linting and formatting
+- Docker
+- Docker Compose with PostgreSQL
+- GitHub Actions CI
+- Dependabot
+- Swagger/OpenAPI documentation
 
-## Tech Stack
+## Architecture
 
-* Python 3.12
-* FastAPI
-* Pydantic Settings
-* SQLAlchemy
-* SQLite / PostgreSQL
-* Google GenAI SDK
-* Pytest
-* Docker
+```text
+HTTP Request
+    |
+    v
+FastAPI Router
+    |
+    v
+Pydantic Validation
+    |
+    v
+Endpoint
+    |
+    v
+Service Layer
+    |
+    +----> Gemini API
+    |
+    +----> Database
+    |
+    v
+Typed Pydantic Response
+    |
+    v
+JSON Response
+```
+
+The API layer handles HTTP concerns.
+
+The schema layer defines validated input and output structures.
+
+The service layer handles external AI logic.
+
+The core layer contains application-wide infrastructure such as configuration, logging, and exceptions.
+
+The database layer manages database connectivity.
 
 ## Project Structure
 
-```txt
+```text
 ai-engineering-starter-kit/
-│
+|
+├── .github/
+│   ├── ISSUE_TEMPLATE/
+│   ├── workflows/
+│   │   └── ci.yml
+│   ├── dependabot.yml
+│   └── PULL_REQUEST_TEMPLATE.md
+|
 ├── app/
-│   ├── main.py
 │   ├── api/
 │   │   └── v1/
-│   │       ├── router.py
-│   │       └── endpoints/
-│   │           ├── health.py
-│   │           └── ai.py
+│   │       ├── endpoints/
+│   │       │   ├── ai.py
+│   │       │   └── health.py
+│   │       └── router.py
 │   ├── core/
 │   │   ├── config.py
-│   │   ├── logging.py
-│   │   └── exceptions.py
+│   │   ├── exceptions.py
+│   │   └── logging.py
 │   ├── db/
 │   │   ├── base.py
 │   │   └── database.py
 │   ├── schemas/
+│   │   ├── ai.py
 │   │   ├── common.py
-│   │   └── ai.py
-│   └── services/
-│       └── gemini_service.py
-│
+│   │   └── health.py
+│   ├── services/
+│   │   └── gemini_service.py
+│   └── main.py
+|
 ├── tests/
 │   ├── conftest.py
-│   ├── test_health.py
-│   └── test_ai.py
-│
+│   ├── test_ai.py
+│   └── test_health.py
+|
+├── .dockerignore
+├── .editorconfig
 ├── .env.example
 ├── .gitignore
+├── .python-version
+├── compose.yaml
+├── CONTRIBUTING.md
 ├── Dockerfile
-├── requirements.txt
+├── LICENSE
+├── pyproject.toml
 ├── requirements-dev.txt
-└── README.md
+├── requirements.txt
+├── README.md
+└── SECURITY.md
 ```
 
-## Setup
+## Requirements
 
-### 1. Clone the repo
+- Python 3.12
+- A Gemini API key
+- Docker, optional
+- PostgreSQL, optional
+
+## Quick Start
+
+Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ai-engineering-starter-kit.git
+git clone https://github.com/Saifee16/ai-engineering-starter-kit.git
 cd ai-engineering-starter-kit
 ```
 
-### 2. Create virtual environment
+### Create a Virtual Environment
 
 Windows PowerShell:
 
@@ -86,21 +162,42 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
-### 3. Install dependencies
+macOS/Linux:
 
-```powershell
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+### Install Dependencies
+
+For development:
+
+```bash
 pip install -r requirements-dev.txt
 ```
 
-### 4. Create `.env`
+For runtime only:
 
-Copy `.env.example` to `.env`.
-
-```powershell
-copy .env.example .env
+```bash
+pip install -r requirements.txt
 ```
 
-Then add your real Gemini API key:
+### Create Environment Configuration
+
+Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+macOS/Linux:
+
+```bash
+cp .env.example .env
+```
+
+Add your Gemini API key to `.env`:
 
 ```env
 APP_NAME=AI Engineering Starter Kit
@@ -116,24 +213,30 @@ GEMINI_API_KEY=your_real_gemini_api_key_here
 GEMINI_MODEL=gemini-3.5-flash
 ```
 
-Do not commit `.env` to GitHub.
+Never commit `.env`.
 
 ## Run Locally
 
-```powershell
+```bash
 uvicorn app.main:app --reload
 ```
 
-API will run at:
+API:
 
-```txt
+```text
 http://127.0.0.1:8000
 ```
 
-Swagger docs:
+Swagger:
 
-```txt
+```text
 http://127.0.0.1:8000/docs
+```
+
+ReDoc:
+
+```text
+http://127.0.0.1:8000/redoc
 ```
 
 ## API Endpoints
@@ -171,13 +274,13 @@ Request:
 }
 ```
 
-Response:
+Example response:
 
 ```json
 {
   "success": true,
   "data": {
-    "reply": "FastAPI is a Python framework for building fast, typed, automatically documented APIs."
+    "reply": "FastAPI is a Python framework for building modern APIs."
   }
 }
 ```
@@ -196,88 +299,167 @@ Request:
 }
 ```
 
-Response:
+Example response:
 
 ```json
 {
   "success": true,
   "data": {
     "title": "FastAPI",
-    "summary": "FastAPI helps developers build modern APIs quickly using Python type hints.",
+    "summary": "FastAPI is a modern Python API framework.",
     "difficulty": "beginner"
   }
 }
 ```
 
-## Run Tests
+## Tests
 
-```powershell
+Run all tests:
+
+```bash
 pytest
 ```
 
-Expected:
+Run tests with coverage:
 
-```txt
-4 passed
+```bash
+pytest --cov=app --cov-report=term-missing
+```
+
+The test suite mocks Gemini and does not require live Gemini API requests.
+
+## Code Quality
+
+Check code:
+
+```bash
+ruff check .
+```
+
+Automatically fix safe lint issues:
+
+```bash
+ruff check . --fix
+```
+
+Format code:
+
+```bash
+ruff format .
+```
+
+Verify formatting:
+
+```bash
+ruff format --check .
 ```
 
 ## Docker
 
-### Build image
+Build the image:
 
-```powershell
+```bash
 docker build -t ai-engineering-starter-kit .
 ```
 
-### Run without environment file
+Run with environment variables:
 
-```powershell
-docker run -p 8000:8000 ai-engineering-starter-kit
-```
-
-Health endpoint will work, but Gemini endpoints require an API key.
-
-### Run with `.env`
-
-```powershell
+```bash
 docker run --env-file .env -p 8000:8000 ai-engineering-starter-kit
 ```
 
-Then open:
+Open:
 
-```txt
+```text
 http://127.0.0.1:8000/docs
 ```
 
-## Database
+## Docker Compose with PostgreSQL
 
-Default local database:
+Create `.env` first.
+
+Then run:
+
+```bash
+docker compose up --build
+```
+
+This starts:
+
+- FastAPI
+- PostgreSQL
+
+The API container uses PostgreSQL through the internal Docker network.
+
+Stop the services:
+
+```bash
+docker compose down
+```
+
+Remove containers and PostgreSQL volume data:
+
+```bash
+docker compose down -v
+```
+
+## Database Configuration
+
+SQLite:
 
 ```env
 DATABASE_URL=sqlite:///./app.db
 ```
 
-PostgreSQL example:
+PostgreSQL:
 
 ```env
 DATABASE_URL=postgresql+psycopg://user:password@localhost:5432/ai_starter
 ```
 
-## GitHub Push
+The SQLAlchemy engine is created from `DATABASE_URL`.
 
-```powershell
-git init
-git add .
-git commit -m "Initial AI engineering starter kit"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/ai-engineering-starter-kit.git
-git push -u origin main
-```
+## Continuous Integration
 
-## Notes
+GitHub Actions runs on pushes and pull requests targeting `main`.
 
-* Keep `.env` private.
-* Use `.env.example` as the public template.
-* Do not call Gemini directly from the frontend.
-* Use tests with fake services instead of real Gemini calls.
-* Use Docker for consistent deployment.
+CI checks:
+
+- Ruff linting
+- Ruff formatting
+- Pytest
+- Test coverage generation
+- Docker image build
+
+## Using This Repository as a Starter
+
+Create a repository from this template or clone it.
+
+Then:
+
+1. Change `APP_NAME`.
+2. Replace or extend the AI schemas.
+3. Add new endpoint modules.
+4. Add service-layer integrations.
+5. Add SQLAlchemy models as needed.
+6. Add database migrations when your application begins changing table schemas.
+7. Add authentication only when the application's requirements are defined.
+8. Add application-specific tests.
+
+Avoid putting business logic directly inside endpoint functions.
+
+## Security
+
+Never expose Gemini or database credentials in frontend code.
+
+Never commit `.env`.
+
+For security vulnerabilities, follow `SECURITY.md`.
+
+## Contributing
+
+See `CONTRIBUTING.md`.
+
+## License
+
+MIT License. See `LICENSE`.
